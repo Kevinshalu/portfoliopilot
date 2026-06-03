@@ -119,16 +119,33 @@ Update this file at the end of each day to track progress against the 7-day plan
 
 ---
 
-## Day 5 — June 5, 2026
+## Day 5 — June 2, 2026 (built early; planned for June 5)
 
 **Goal:** FastAPI backend + Streamlit frontend
 
 **Completed:**
-- [ ] backend/main.py: /query, /stream, /health endpoints
-- [ ] frontend/app.py: 3-panel Streamlit dashboard
-- [ ] 5 quick-click sample query buttons
-- [ ] Integration tested end-to-end locally
-- [ ] Commit progress
+- [x] backend/main.py: POST /query and GET /health (Pydantic-validated request/response, CORS for local dev)
+- [x] /stream endpoint deferred per "ship what works" rule — SSE adds complexity without much demo value at this scale
+- [x] frontend/app.py: 3-panel Streamlit dashboard (holdings | query | answer)
+- [x] 5 quick-click sample query buttons + free-text input
+- [x] Integration tested end-to-end locally — Streamlit calls FastAPI via httpx, answer + tool trace render correctly
+- [x] 3 backend tests using FastAPI TestClient (mocked agent, free, deterministic)
+- [x] Commit progress
+
+**Lessons learned:**
+- Streamlit can't be invoked with `python -m`, so the sys.path hack at the top of frontend/app.py is required (or PYTHONPATH=.). Project-root sys.path.insert is more robust because it survives any deployment context.
+- @st.cache_data(ttl=60) is essential — Streamlit re-runs the entire script on every interaction; without caching we'd hit yfinance dozens of times in a session.
+- session_state is needed to make button clicks (sample queries) trigger the agent in a different column. Without it, the local `query` variable disappears on the next rerun.
+- httpx default timeout is 5s; agent calls can take 20–40s on multi-tool queries. Bumped to 120s.
+- Streamlit auto-reloads on file save (hot reload "out of the box") — significant productivity win vs FastAPI which needs `--reload` flag on uvicorn.
+- FastAPI's auto-generated /docs Swagger UI is portfolio gold for interview demos — visual proof of clean API design.
+
+**Notes for Day 6:**
+- Day 6 focus: polish, deploy, finalize README, architecture diagram
+- Deploy decision: Streamlit Cloud doesn't host FastAPI. Two options: (a) Streamlit-direct calls (skip FastAPI in prod, keep in repo as architectural artifact), (b) deploy FastAPI on Render/Fly.io free tier. Recommend (a) for time-to-ship; document (b) as "production path" in README.
+- README: replace placeholder with full architecture diagram, design decisions, quickstart, screenshots
+- Architecture diagram: excalidraw.com, 10 minutes
+- Bug-fix pass through all 10 golden_dataset queries
 
 ---
 

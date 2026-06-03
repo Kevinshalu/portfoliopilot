@@ -1,46 +1,62 @@
 """
-FastAPI Backend — TO BE IMPLEMENTED ON DAY 5
+PortfolioPilot FastAPI backend.
 
-Exposes the PortfolioPilot agent via REST + SSE streaming endpoints.
+Thin HTTP wrapper around agent.portfoliopilot_agent.run_query.
+Two endpoints: POST /query and GET /health.
 
-Endpoints:
-- POST /query    — accept a natural-language query, return agent response (sync)
-- POST /stream   — accept a query, stream agent response token-by-token (SSE)
-- POST /eval     — run the eval suite, return results
-- GET  /health   — health check
+Run locally:
+    uvicorn backend.main:app --reload --port 8000
+
+Auto-generated OpenAPI docs at http://localhost:8000/docs
 """
 
 from __future__ import annotations
 
-# TODO Day 5: implement
-# from fastapi import FastAPI
-# from pydantic import BaseModel
-#
-# from agent.portfoliopilot_agent import build_agent
-#
-# app = FastAPI(title="PortfolioPilot API", version="0.1.0")
-# agent = build_agent()
-#
-#
-# class QueryRequest(BaseModel):
-#     query: str
-#
-#
-# @app.get("/health")
-# def health():
-#     return {"status": "ok"}
-#
-#
-# @app.post("/query")
-# async def query(request: QueryRequest):
-#     result = await agent.ainvoke({"messages": [("user", request.query)]})
-#     return {"response": result["messages"][-1].content}
-#
-#
-# @app.post("/stream")
-# async def stream(request: QueryRequest):
-#     # TODO: SSE streaming via sse_starlette
-#     pass
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+
+from agent.portfoliopilot_agent import run_query
 
 
-# Run with: uvicorn backend.main:app --reload --port 8000
+app = FastAPI(
+    title="PortfolioPilot API",
+    description="Agentic AI assistant for portfolio managers.",
+    version="0.1.0",
+)
+
+# Allow the Streamlit frontend (any localhost port) to call us during dev.
+# Tighten this to specific origins before any real deployment.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class QueryRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=2000, description="Natural-language PM question")
+
+
+class QueryResponse(BaseModel):
+    final_answer: str
+    tools_called: list[str]
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    """Liveness probe."""
+    return {"status": "ok"}
+
+
+@app.post("/query", response_model=QueryResponse)
+def query(req: QueryRequest) -> QueryResponse:
+    """Run a single PM question through the PortfolioPilot agent."""
+    try:
+        result = run_query(req.query)
+    except Exception as e:
+        # Surface the error as a 500 rather than crashing the worker.
+        raise HTTPException(status_code=500, detail=f"Agent error: {e}") from e
+    return QueryResponse(**result)
