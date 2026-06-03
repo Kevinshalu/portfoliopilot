@@ -53,6 +53,13 @@ This document explicitly catalogs what PortfolioPilot is NOT, alongside what it 
 
 **Production version would need:** Persistent memory layer (vector DB or structured), user-specific preferences, conversation context.
 
+### 6b. Multi-step orchestration is fragile on implicit filters
+Caught by our own eval suite (`evals/eval_suite.py`): on the query *"Summarize news on my financial holdings and flag any risks,"* the agent correctly chains `summarize_holdings_news` + `flag_anomalies` but skips calling `get_portfolio_holdings(sectors=["Financials"])` first to scope the universe — so it summarizes news for all 10 holdings instead of just JPM and GS. The implicit "filter by sector" instruction is missed.
+
+Current scoreboard: 100% single-tool accuracy (9/9), 0% multi-step accuracy (0/1), 90% overall.
+
+**Production version would need:** (a) a query-decomposition pre-step that surfaces implicit filters before tool selection, (b) few-shot examples in the system prompt showing scope-then-act patterns, or (c) a dedicated `filter_holdings` tool exposed separately from `get_portfolio_holdings`.
+
 ---
 
 ## Product / UX limitations

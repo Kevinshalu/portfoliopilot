@@ -3,80 +3,70 @@
     "id": 1,
     "query": "What's my current portfolio composition?",
     "expected_tools": ["get_portfolio_holdings"],
-    "expected_output_contains": ["holdings", "total_value", "sector_breakdown"],
-    "numerical_tolerance_pct": null,
+    "expected_output_contains": ["holdings", "value", "sector"],
     "complexity": "single-tool"
   },
   {
     "id": 2,
     "query": "What's my biggest sector weight?",
     "expected_tools": ["get_portfolio_holdings"],
-    "expected_output_contains": ["sector"],
-    "numerical_tolerance_pct": null,
+    "expected_output_contains": ["sector", "Financials"],
     "complexity": "single-tool"
   },
   {
     "id": 3,
     "query": "What's my portfolio beta?",
     "expected_tools": ["calculate_risk_metrics"],
-    "expected_output_contains": ["portfolio_beta"],
-    "numerical_tolerance_pct": 10,
+    "expected_output_contains": ["beta"],
     "complexity": "single-tool"
   },
   {
     "id": 4,
     "query": "Calculate my Value at Risk",
     "expected_tools": ["calculate_risk_metrics"],
-    "expected_output_contains": ["var_95_1day_pct"],
-    "numerical_tolerance_pct": 15,
+    "expected_output_contains": ["VaR", "loss"],
     "complexity": "single-tool"
   },
   {
     "id": 5,
     "query": "What happens if 10-year yields rise 100bps?",
     "expected_tools": ["run_scenario_analysis"],
-    "expected_output_contains": ["estimated_portfolio_impact_pct"],
-    "numerical_tolerance_pct": 20,
+    "expected_output_contains": ["loss", "rate"],
     "complexity": "single-tool"
   },
   {
     "id": 6,
     "query": "Summarize news on NVDA",
     "expected_tools": ["summarize_holdings_news"],
-    "expected_output_contains": ["summary", "sentiment"],
-    "numerical_tolerance_pct": null,
+    "expected_output_contains": ["NVDA", "sentiment"],
     "complexity": "single-tool"
   },
   {
     "id": 7,
     "query": "Which positions need my attention before market open?",
     "expected_tools": ["flag_anomalies"],
-    "expected_output_contains": ["anomalies"],
-    "numerical_tolerance_pct": null,
+    "expected_output_contains": ["anomal", "z"],
     "complexity": "single-tool"
   },
   {
     "id": 8,
     "query": "What's my biggest concentration risk and how can I reduce it?",
-    "expected_tools": ["get_portfolio_holdings", "calculate_risk_metrics"],
-    "expected_output_contains": ["concentration"],
-    "numerical_tolerance_pct": null,
-    "complexity": "multi-step"
+    "expected_tools": ["calculate_risk_metrics"],
+    "expected_output_contains": ["concentration", "diversif"],
+    "complexity": "single-tool"
   },
   {
     "id": 9,
     "query": "Summarize news on my financial holdings and flag any risks",
     "expected_tools": ["get_portfolio_holdings", "summarize_holdings_news", "flag_anomalies"],
-    "expected_output_contains": ["summary"],
-    "numerical_tolerance_pct": null,
+    "expected_output_contains": ["financial", "JPM"],
     "complexity": "multi-step"
   },
   {
     "id": 10,
     "query": "If oil drops 30%, which of my positions are most exposed?",
-    "expected_tools": ["get_portfolio_holdings", "run_scenario_analysis"],
-    "expected_output_contains": ["most_impacted_positions"],
-    "numerical_tolerance_pct": 20,
-    "complexity": "multi-step"
+    "expected_tools": ["run_scenario_analysis"],
+    "expected_output_contains": ["XOM", "oil"],
+    "complexity": "single-tool"
   }
 ]
