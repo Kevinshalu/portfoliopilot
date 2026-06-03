@@ -2,7 +2,7 @@
 
 > Agentic AI assistant for portfolio managers — natural-language interface, multi-tool LLM agent for portfolio composition, risk decomposition, scenario analysis, news synthesis, and pre-market anomaly detection.
 
-Built in a 7-day sprint to demonstrate the agentic-AI patterns that asset managers (BlackRock Aladdin AI, Bloomberg AI, Morgan Stanley AI@MS) are productizing for portfolio managers.
+Built in a 2-day sprint to demonstrate the agentic-AI patterns that asset managers (BlackRock Aladdin AI, Bloomberg AI, Morgan Stanley AI@MS) are productizing for portfolio managers.
 
 ---
 
