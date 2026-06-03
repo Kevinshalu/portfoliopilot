@@ -6,8 +6,13 @@ Three-panel layout:
   Middle - free-text query input + 5 sample-query buttons
   Right  - agent response + tools called
 
-Run locally (requires backend on :8000):
-    streamlit run frontend/app.py
+Two run modes:
+  1. Direct (default; used on Streamlit Cloud): import + call run_query in-process.
+  2. HTTP: set PORTFOLIOPILOT_API=http://host:port to call a deployed FastAPI.
+
+Locally:
+    streamlit run frontend/app.py                       # direct
+    PORTFOLIOPILOT_API=http://localhost:8000 streamlit run frontend/app.py   # via FastAPI
 """
 from __future__ import annotations
 
@@ -22,7 +27,7 @@ import pandas as pd
 import streamlit as st
 
 
-API_URL = os.getenv("PORTFOLIOPILOT_API", "http://localhost:8000")
+API_URL = os.getenv("PORTFOLIOPILOT_API")  # None → direct in-process mode
 SAMPLE_QUERIES = [
     "What's in my portfolio?",
     "What's the risk?",
@@ -40,9 +45,14 @@ st.caption("Agentic AI assistant for portfolio managers — prototype")
 
 # --- Backend client + cached portfolio fetch ------------------------------
 def call_agent(query: str) -> dict:
-    response = httpx.post(f"{API_URL}/query", json={"query": query}, timeout=120)
-    response.raise_for_status()
-    return response.json()
+    """Call the agent via HTTP if PORTFOLIOPILOT_API is set, else in-process."""
+    if API_URL:
+        response = httpx.post(f"{API_URL}/query", json={"query": query}, timeout=120)
+        response.raise_for_status()
+        return response.json()
+    # Direct in-process mode (Streamlit Cloud default)
+    from agent.portfoliopilot_agent import run_query
+    return run_query(query)
 
 
 @st.cache_data(ttl=60)
