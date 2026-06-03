@@ -91,16 +91,31 @@ Update this file at the end of each day to track progress against the 7-day plan
 
 ---
 
-## Day 4 — June 4, 2026
+## Day 4 — June 2, 2026 (built early; planned for June 4)
 
 **Goal:** Tool 5 (anomalies) + agent integration
 
 **Completed:**
-- [ ] tools/anomalies.py: z-score-based detection
-- [ ] agent/portfoliopilot_agent.py: LangGraph ReAct agent
-- [ ] System prompt finalized
-- [ ] End-to-end test from REPL: 5 sample queries
-- [ ] Commit progress
+- [x] tools/anomalies.py: z-score-based detection on daily return, volume, intraday range; baseline excludes the recent window to avoid self-inflation
+- [x] agent/portfoliopilot_agent.py: LangGraph ReAct agent wrapping all 5 tools
+- [x] System prompt finalized with 5 explicit rules (#1 = "always call tools, never fabricate")
+- [x] End-to-end smoke from __main__: 4 sample queries — composition, risk, scenario, anomalies — agent routes to correct tool every time
+- [x] Tests: 3 for anomalies + 2 for agent (5 total; 1 live LLM agent test ~$0.001)
+- [x] Commit progress
+
+**Lessons learned:**
+- Defensive std=0 → NaN replacement (correct production behavior) broke the first synthetic test (flat baseline). Lesson: synthetic test data needs realistic noise structure, not constant values.
+- yfinance returns columns as MultiIndex for single-ticker downloads in 0.2.40+ — flatten with `df.columns.get_level_values(0)` to keep downstream access uniform.
+- LangGraph's `create_react_agent` handles the entire reason-act-observe loop; we wrote zero loop code, just @tool wrappers + a system prompt.
+- Tool docstrings literally become the LLM's tool descriptions — write them like you're explaining to a colleague who's never seen the codebase.
+- Lazy singleton for the agent (`_agent = None` + `_get_agent`) saves ~50ms per query after the first.
+- LangGraph v1.0 deprecation warning on `create_react_agent` (moves to `langchain.agents.create_agent` in v2.0). Tracked as known cleanup, not blocking — no v2.0 release date yet.
+
+**Notes for Day 5:**
+- Day 5 focus: FastAPI backend + Streamlit frontend
+- Backend: /query (POST, sync), /health endpoints — wrap run_query() from the agent module
+- Frontend: 3-panel Streamlit (holdings table | chat | output) with 5 quick-click sample query buttons
+- Per the plan, no /stream endpoint unless time permits — SSE adds complexity without much demo value
 
 ---
 
