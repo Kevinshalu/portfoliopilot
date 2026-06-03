@@ -1,0 +1,88 @@
+{
+  "portfolio_name": "Sample Diversified US Equity Portfolio",
+  "base_currency": "USD",
+  "as_of_date": "2026-06-01",
+  "description": "Synthetic portfolio of 10 S&P 500 holdings spanning major sectors. For demonstration purposes only. Not investment advice.",
+  "holdings": [
+    {
+      "ticker": "JPM",
+      "name": "JPMorgan Chase & Co.",
+      "sector": "Financials",
+      "shares": 1500,
+      "purchase_date": "2024-03-15",
+      "purchase_price": 175.50
+    },
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA Corporation",
+      "sector": "Information Technology",
+      "shares": 200,
+      "purchase_date": "2024-01-10",
+      "purchase_price": 540.20
+    },
+    {
+      "ticker": "AAPL",
+      "name": "Apple Inc.",
+      "sector": "Information Technology",
+      "shares": 800,
+      "purchase_date": "2024-02-20",
+      "purchase_price": 184.30
+    },
+    {
+      "ticker": "GS",
+      "name": "Goldman Sachs Group, Inc.",
+      "sector": "Financials",
+      "shares": 400,
+      "purchase_date": "2024-04-05",
+      "purchase_price": 390.10
+    },
+    {
+      "ticker": "AMZN",
+      "name": "Amazon.com, Inc.",
+      "sector": "Consumer Discretionary",
+      "shares": 350,
+      "purchase_date": "2024-03-01",
+      "purchase_price": 178.40
+    },
+    {
+      "ticker": "JNJ",
+      "name": "Johnson & Johnson",
+      "sector": "Health Care",
+      "shares": 600,
+      "purchase_date": "2024-01-25",
+      "purchase_price": 158.80
+    },
+    {
+      "ticker": "XOM",
+      "name": "Exxon Mobil Corporation",
+      "sector": "Energy",
+      "shares": 500,
+      "purchase_date": "2024-02-12",
+      "purchase_price": 105.20
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft Corporation",
+      "sector": "Information Technology",
+      "shares": 450,
+      "purchase_date": "2024-03-10",
+      "purchase_price": 415.60
+    },
+    {
+      "ticker": "WMT",
+      "name": "Walmart Inc.",
+      "sector": "Consumer Staples",
+      "shares": 700,
+      "purchase_date": "2024-04-15",
+      "purchase_price": 61.30
+    },
+    {
+      "ticker": "META",
+      "name": "Meta Platforms, Inc.",
+      "sector": "Communication Services",
+      "shares": 300,
+      "purchase_date": "2024-02-28",
+      "purchase_price": 478.20
+    }
+  ]
+}
