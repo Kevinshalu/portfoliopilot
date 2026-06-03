@@ -41,29 +41,53 @@ Update this file at the end of each day to track progress against the 7-day plan
 **Goal:** Tool 2 (risk metrics) + unit tests
 
 **Completed:**
-- [ ] tools/risk.py: `calculate_risk_metrics()` function
-- [ ] Beta calculation vs S&P 500
-- [ ] Annualized volatility
-- [ ] VaR 95% 1-day (parametric)
-- [ ] Factor exposures (using value/momentum/quality/low-vol ETF proxies)
-- [ ] Concentration metrics (top 5 weight, max position, Herfindahl)
-- [ ] Unit tests for risk.py (5 tests minimum)
+- [x] tools/risk.py: `calculate_risk_metrics()` function
+- [x] Beta calculation vs S&P 500 (weighted average; portfolio beta = 1.06)
+- [x] Annualized volatility (14.41% on current sample portfolio)
+- [x] VaR 95% 1-day, parametric ($28,921 / 1.49% on $1.93M portfolio)
+- [x] Factor exposures via VLUE/MTUM/QUAL/USMV ETF proxies (quality 0.98 dominant)
+- [x] Concentration metrics: top-5 weight 78.14%, max position 23.34%, Herfindahl 0.1503, effective N 6.7
+- [x] Unit tests for risk.py — 6 tests, all passing (~15s runtime)
 - [ ] Commit progress
 
+**Lessons learned:**
+- Direct-running a file inside `tools/` requires `python -m tools.risk` (not `python tools/risk.py`) so the project root is on sys.path
+- yfinance returns Series for 1 ticker, DataFrame for many — normalize at the boundary
+- Used 4 univariate factor regressions instead of one multivariate, because the iShares factor ETFs are highly correlated and multivariate coefficients would be unstable. Documented as a known simplification.
+- numpy scalar floats (`np.float64`) don't JSON-serialize cleanly — cast to native `float` at the public-API boundary
+
 **Notes for Day 3:**
-- (fill in at end of Day 2)
+- Day 3 focus: Tool 3 (scenarios) + Tool 4 (news)
+- Scenarios: pre-defined rate shock / equity crash / oil shock; apply impact via sector or beta sensitivities
+- News: yfinance `.news` pull per ticker + GPT-4o-mini summarization with sentiment + themes
+- Both should reuse the holdings + risk patterns (function + `__main__` smoke block + ≥5 unit tests)
 
 ---
 
-## Day 3 — June 3, 2026
+## Day 3 — June 2, 2026 (built early; planned for June 3)
 
 **Goal:** Tool 3 (scenarios) + Tool 4 (news)
 
 **Completed:**
-- [ ] tools/scenarios.py: pre-defined scenarios (rate shock, equity crash, oil shock)
-- [ ] tools/news.py: yfinance.news pull + LLM summarization
-- [ ] Unit tests for both
-- [ ] Commit progress
+- [x] tools/scenarios.py: 3 pre-defined scenarios (rate_shock_+100bps, equity_crash_-20%, oil_shock_+30%) with per-sector overrides on top of beta-driven market move
+- [x] tools/news.py: yfinance.news pull + GPT-4o-mini structured-output summarization (one LLM call, per-ticker sentiment + themes + cross-portfolio themes)
+- [x] OpenAI API key wired via python-dotenv + .env (gitignored)
+- [x] Unit tests: 3 for scenarios + 3 for news (6 total, ~8s runtime)
+- [x] Commit progress
+
+**Lessons learned:**
+- yfinance changed its `.news` response shape in 0.2.40+ (everything wrapped in `content` sub-dict). The `content = item.get("content", item)` pattern handles both versions.
+- OpenAI's `.beta.chat.completions.parse()` with a Pydantic `response_format` gives typed JSON guarantees — no regex, no json.loads try/except.
+- One LLM call across all tickers (vs. per-ticker calls) is cheaper AND unlocks cross-portfolio theme detection that per-ticker loops can't do.
+- Live LLM calls in pytest add cost on every test run; mock `_summarize_with_llm` and keep the live LLM check as the `__main__` smoke block.
+- Scenarios with no sector_overrides + a market_move act as pure beta stress tests; this is the right primitive to compose more complex scenarios later.
+
+**Notes for Day 4:**
+- Day 4 focus: Tool 5 (anomalies) + agent integration
+- Anomalies: z-score-based detection on daily returns + volume; window param defaults to 60d for baseline
+- Agent: LangGraph ReAct pattern in agent/portfoliopilot_agent.py wrapping all 5 tools
+- System prompt should: (1) describe each tool's purpose, (2) anchor the agent to use real tool calls vs. fabricating numbers, (3) name itself "PortfolioPilot"
+- Aim to ship Day 4 ahead of plan too — currently ~24h ahead of schedule
 
 ---
 
